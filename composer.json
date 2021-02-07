@@ -1,0 +1,26 @@
+{
+    "name": "imponeer/smarty-xo",
+    "description": "Smarty template engine plugins collections based on ideas for plugins from XOOPS",
+    "type": "library",
+    "require": {
+        "imponeer/smarty-extensions-contracts": "^1.0",
+        "php": ">=7.1"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Raimondas Rimkevičius",
+            "email": "github@mekdrop.name"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Imponeer\\Smarty\\Extensions\\XO\\": "src/"
+        }
+    },
+    "keywords": [
+        "smarty",
+        "xoops",
+        "smarty-plugins"
+    ]
+}
