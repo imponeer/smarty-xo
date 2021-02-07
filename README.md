@@ -1,8 +1,8 @@
 [![License](https://img.shields.io/github/license/imponeer/smarty-xo.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-xo.svg)](https://github.com/imponeer/smarty-xo/releases) [![Maintainability](https://api.codeclimate.com/v1/badges/c284ca86c6df6e98b9d0/maintainability)](https://codeclimate.com/github/imponeer/smarty-xo/maintainability) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-xo.svg)](http://php.net) 
+[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-xo.svg)](https://github.com/imponeer/smarty-xo/releases) [![Maintainability](https://api.codeclimate.com/v1/badges/8e9a1579e56699e95b05/maintainability)](https://codeclimate.com/github/imponeer/smarty-xo/maintainability) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-xo.svg)](http://php.net) 
 [![Packagist](https://img.shields.io/packagist/dm/imponeer/smarty-xo.svg)](https://packagist.org/packages/imponeer/smarty-xo)
 
-# Smarty Image
+# Smarty XO
 
 Rewritten (due licensing issues) collection [Smarty](https://smarty.net) plugins that where originally written for [Xoops](https://xoops.org) but now can be used everywhere.
 
