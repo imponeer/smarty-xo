@@ -21,6 +21,9 @@
     "keywords": [
         "smarty",
         "xoops",
+        "links",
+        "counter",
+        "pagination",
         "smarty-plugins"
     ]
 }
