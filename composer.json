@@ -3,7 +3,7 @@
     "description": "Smarty template engine plugins collections based on ideas for plugins from XOOPS",
     "type": "library",
     "require": {
-        "imponeer/smarty-extensions-contracts": "^1.0",
+        "imponeer/smarty-extensions-contracts": "^1.0 || ^2.0",
         "php": ">=7.1"
     },
     "license": "MIT",
