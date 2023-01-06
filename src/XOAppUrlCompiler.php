@@ -2,6 +2,7 @@
 
 namespace Imponeer\Smarty\Extensions\XO;
 
+use Imponeer\Contracts\Smarty\Extension\SmartyCompilerInterface;
 use Smarty_Internal_SmartyTemplateCompiler;
 
 /**
@@ -9,7 +10,7 @@ use Smarty_Internal_SmartyTemplateCompiler;
  *
  * @package Imponeer\Smarty\Extensions\XO
  */
-class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCompilerInterface
+class XOAppUrlCompiler implements SmartyCompilerInterface
 {
 
     /**
@@ -30,7 +31,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      */
     public function __construct(callable $pathCallable, callable $buildUrlCallable)
     {
-        // maybe this is not the best way but it should work
+        // maybe this is not the best way, but it should work
         self::$pathCallable = $pathCallable;
         self::$buildUrlCallable = $buildUrlCallable;
     }
@@ -38,7 +39,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
     /**
      * @inheritDoc
      */
-    public function execute($args, Smarty_Internal_SmartyTemplateCompiler &$compiler)
+    public function execute($args, Smarty_Internal_SmartyTemplateCompiler $compiler)
     {
         $url = trim($args[0]);
         $params = (count($args) > 1) ? array_slice($args, 1) : [];
@@ -60,6 +61,8 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      */
     protected function generateStaticUrl(string $url, array $params): string
     {
+        $url = $this->stripQuotesFromString($url);
+
         if (!empty($params)) {
             $url = self::executeBuildUrl(
                 $url,
@@ -67,9 +70,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
             );
         }
 
-        return htmlspecialchars(
-            self::executePath($url)
-        );
+        return self::executePath($url);
     }
 
     /**
@@ -80,9 +81,31 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      *
      * @return string
      */
-    public static function executeBuildUrl($url, $params): string
+    public static function executeBuildUrl(string $url, array $params): string
     {
         return call_user_func(self::$buildUrlCallable, $url, $params);
+    }
+
+    /**
+     * Strips quotes from string
+     *
+     * @param string $str String to strip quotes if needed
+     *
+     * @return string
+     */
+    protected function stripQuotesFromString(string $str): string {
+        if (mb_strlen($str) < 2) {
+            return $str;
+        }
+
+        $firstChar = substr($str, 0, 1);
+        $lastChar = substr($str, -1);
+
+        if ($firstChar === $lastChar && in_array($firstChar, ['"', "'"], true)) {
+            return substr($str, 1, -1);
+        }
+
+        return $str;
     }
 
     /**
@@ -95,10 +118,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
     protected function stripQuotesFromParams(array $params): array
     {
         foreach ($params as $k => $v) {
-            $firstChar = substr($v, 0, 1);
-            if ($firstChar === '"' || $firstChar === "'") {
-                $params[$k] = substr($v, 1, -1);
-            }
+            $params[$k] = $this->stripQuotesFromString($v);
         }
         return $params;
     }
@@ -110,7 +130,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      *
      * @return string
      */
-    public static function executePath($url): string
+    public static function executePath(string $url): string
     {
         return call_user_func(self::$pathCallable, $url);
     }
