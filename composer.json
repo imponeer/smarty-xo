@@ -19,6 +19,11 @@
             "Imponeer\\Smarty\\Extensions\\XO\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Imponeer\\Smarty\\Extensions\\XO\\Tests\\": "tests/"
+        }
+    },
     "keywords": [
         "smarty",
         "xoops",

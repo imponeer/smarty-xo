@@ -3,6 +3,7 @@
 namespace Imponeer\Smarty\Extensions\XO;
 
 use Imponeer\Contracts\Smarty\Extension\SmartyCompilerInterface;
+use Imponeer\Smarty\Extensions\XO\Traits\StripQuotesTrait;
 use Smarty_Internal_SmartyTemplateCompiler;
 
 /**
@@ -12,6 +13,7 @@ use Smarty_Internal_SmartyTemplateCompiler;
  */
 class XOAppUrlCompiler implements SmartyCompilerInterface
 {
+    use StripQuotesTrait;
 
     /**
      * @var callable
@@ -87,43 +89,6 @@ class XOAppUrlCompiler implements SmartyCompilerInterface
     }
 
     /**
-     * Strips quotes from string
-     *
-     * @param string $str String to strip quotes if needed
-     *
-     * @return string
-     */
-    protected function stripQuotesFromString(string $str): string {
-        if (mb_strlen($str) < 2) {
-            return $str;
-        }
-
-        $firstChar = substr($str, 0, 1);
-        $lastChar = substr($str, -1);
-
-        if ($firstChar === $lastChar && in_array($firstChar, ['"', "'"], true)) {
-            return substr($str, 1, -1);
-        }
-
-        return $str;
-    }
-
-    /**
-     * Strips quotes from params
-     *
-     * @param array $params Params
-     *
-     * @return array
-     */
-    protected function stripQuotesFromParams(array $params): array
-    {
-        foreach ($params as $k => $v) {
-            $params[$k] = $this->stripQuotesFromString($v);
-        }
-        return $params;
-    }
-
-    /**
      * Executes path building function
      *
      * @param string $url URL to use for building
@@ -166,7 +131,7 @@ class XOAppUrlCompiler implements SmartyCompilerInterface
      * @param array $params
      * @return string
      */
-    protected function buildArrayStr(array $params)
+    protected function buildArrayStr(array $params): string
     {
         $ret = '[';
         foreach ($params as $k => $v) {

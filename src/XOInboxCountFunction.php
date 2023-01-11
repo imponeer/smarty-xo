@@ -2,6 +2,7 @@
 
 namespace Imponeer\Smarty\Extensions\XO;
 
+use Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface;
 use Smarty_Internal_Template;
 
 /**
@@ -9,7 +10,7 @@ use Smarty_Internal_Template;
  *
  * @package Imponeer\Smarty\Extensions\XO
  */
-class XOInboxCountFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface
+class XOInboxCountFunction implements SmartyFunctionInterface
 {
     /**
      * @var callable
@@ -37,18 +38,17 @@ class XOInboxCountFunction implements \Imponeer\Contracts\Smarty\Extension\Smart
     /**
      * @inheritDoc
      */
-    public function execute($params, Smarty_Internal_Template &$template)
+    public function execute($params, Smarty_Internal_Template $template)
     {
         $count = call_user_func($this->userInboxCounterCallback);
+        $count = (($count === null) || ($count === 0)) ? null : (int)$count;
 
-        if ($count === null) {
-            return;
+        if (empty($params['assign'])) {
+            return $count;
         }
 
-        if (!isset($params['assign']) || empty($params['assign'])) {
-            return (int)$count;
-        }
+        $template->assign($params['assign'], $count);
 
-        $template->assign($params['assign'], (int)$count);
+        return null;
     }
 }

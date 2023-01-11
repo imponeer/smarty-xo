@@ -2,6 +2,7 @@
 
 namespace Imponeer\Smarty\Extensions\XO;
 
+use Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface;
 use Smarty_Internal_Template;
 
 /**
@@ -9,7 +10,7 @@ use Smarty_Internal_Template;
  *
  * @package Imponeer\Smarty\Extensions\XO
  */
-class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface
+class XOPageNavFunction implements SmartyFunctionInterface
 {
     /**
      * @var callable
@@ -37,7 +38,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      * @param string $strNextPage String to be displayed to next page links
      * @param bool $oldSchoolUrlMode Should parameters in URL be replaced or as array given to URL generation function?
      */
-    public function __construct(callable $urlGenerator, $strPreviousPage = '<', $strNextPage = '>', bool $oldSchoolUrlMode = true)
+    public function __construct(callable $urlGenerator, string $strPreviousPage = '<', string $strNextPage = '>', bool $oldSchoolUrlMode = true)
     {
         $this->urlGeneratorCallable = $urlGenerator;
         $this->oldSchoolUrlMode = $oldSchoolUrlMode;
@@ -56,7 +57,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
     /**
      * @inheritDoc
      */
-    public function execute($params, Smarty_Internal_Template &$template)
+    public function execute($params, Smarty_Internal_Template $template)
     {
         $data = $this->calculateDataFromParams($params);
 
@@ -120,7 +121,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
         $ret = '<' . $name;
 
         foreach ($attributes as $attrName => $attrValue) {
-            $ret .= ' ' . $attrName . '=' . json_encode((string)$attrValue);
+            $ret .= ' ' . $attrName . '="' . htmlentities((string)$attrValue) . '"';
         }
 
         return $ret . '>';
@@ -138,7 +139,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      *
      * @return string
      */
-    protected function buildPreviousPageLink($current, $offset, $size, $url, $liClass, $aClass): string
+    protected function buildPreviousPageLink(int $current, int $offset, int $size, string $url, string $liClass, string $aClass): string
     {
         if ($current > 1) {
             return $this->buildHTMLTag('li', ['class' => $liClass]) .
@@ -159,7 +160,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      *
      * @return string
      */
-    protected function buildAPageTag($page, $url, $title, array $class = []): string
+    protected function buildAPageTag(int $page, string $url, string $title, array $class = []): string
     {
         if ($this->oldSchoolUrlMode) {
             $href = call_user_func(
@@ -167,10 +168,9 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
                 str_replace('%s', $page, $url)
             );
         } else {
-            $href = call_user_func_array($url, $page);
+            $href = $url($page);
         }
-        $class = implode(' ', $class);
-        return $this->buildHTMLTag('a', compact('href', 'class')) . $title . '</a>';
+        return $this->buildHTMLTag('a', ['href' => $href, 'class' => implode(' ', $class)]) . $title . '</a>';
     }
 
     /**
@@ -186,7 +186,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      *
      * @return string
      */
-    protected function buildIndividualPageLinks($current, $linksCount, $last, $size, $url, $liClass, $aClass): string
+    protected function buildIndividualPageLinks(int $current, int $linksCount, int $last, int $size, string $url, string $liClass, string $aClass): string
     {
         $ret = '';
 
@@ -215,7 +215,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      *
      * @return string
      */
-    protected function buildNextPageLink($current, $last, $offset, $size, $url, $liClass, $aClass): string
+    protected function buildNextPageLink(int $current, int $last, int $offset, int $size, string $url, string $liClass, string $aClass): string
     {
         if ($current < $last) {
             return $this->buildHTMLTag('li', ['class' => $liClass]) .
