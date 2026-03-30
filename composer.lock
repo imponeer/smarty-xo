@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cf3cf76101b9f5ae24049d9690a53f54",
+    "content-hash": "9a8f956ec39852362fd1f6ac02a451e3",
     "packages": [
         {
             "name": "imponeer/smarty-extensions-contracts",
@@ -1933,7 +1933,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "imponeer/smarty-extensions-contracts": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

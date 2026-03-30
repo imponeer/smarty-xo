@@ -4,7 +4,7 @@
 
 # Smarty XO
 
-A rewritten (due to licensing issues) collection of [Smarty](https://smarty.net) plugins that were originally written for [Xoops](https://xoops.org) but can now be used in any project that uses Smarty.
+A rewritten (due to licensing issues) collection of [Smarty](https://smarty.net) plugins that were originally written for [Xoops](https://xoops.org) but can now be used in any project that uses Smarty. The package ships with a small compatibility layer so it works with both Smarty 4.x and the namespaced classes in Smarty 5.x.
 
 ## Installation
 
