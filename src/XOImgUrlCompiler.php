@@ -28,6 +28,8 @@ class XOImgUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
 
     /**
      * @inheritDoc
+     *
+     * @param array<int, string> $args
      */
     public function execute($args, Smarty_Internal_SmartyTemplateCompiler &$compiler)
     {

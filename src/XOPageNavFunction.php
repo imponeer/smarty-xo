@@ -55,38 +55,63 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
 
     /**
      * @inheritDoc
+     *
+     * @param array<string, mixed> $params
      */
     public function execute($params, Smarty_Internal_Template &$template)
     {
         $data = $this->calculateDataFromParams($params);
 
-        if ($data['current'] === null) {
+        if ($data['current'] === null || $data['last'] === null) {
             return '';
         }
 
+        $last = $data['last'];
         return $this->buildHTMLTag('nav', ['class' => $data['class']]) .
             $this->buildHTMLTag('ul', ['class' => $data['ulClass']]) .
             $this->buildPreviousPageLink($data['current'], $data['offset'], $data['pageSize'], $data['url'], $data['liClass'], $data['linkClass']) .
-            $this->buildIndividualPageLinks($data['current'], $data['linksCount'], $data['last'], $data['pageSize'], $data['url'], $data['liClass'], $data['linkClass']) .
-            $this->buildNextPageLink($data['current'], $data['last'], $data['offset'], $data['pageSize'], $data['url'], $data['liClass'], $data['linkClass']) .
+            $this->buildIndividualPageLinks($data['current'], $data['linksCount'], $last, $data['pageSize'], $data['url'], $data['liClass'], $data['linkClass']) .
+            $this->buildNextPageLink($data['current'], $last, $data['offset'], $data['pageSize'], $data['url'], $data['liClass'], $data['linkClass']) .
             '</ul></nav>';
     }
 
     /**
      * Calculate data from function params
      *
-     * @param array $params Params used to call function
+     * @param array<string, mixed> $params Params used to call function
      *
-     * @return array
+     * @return array{
+     *     pageSize:int,
+     *     itemsCount:int,
+     *     offset:int,
+     *     linksCount:int,
+     *     url: callable|string,
+     *     class:string,
+     *     ulClass:string,
+     *     liClass:string,
+     *     linkClass:string,
+     *     current:int|null,
+     *     last:int|null
+     * }
      */
     protected function calculateDataFromParams(array $params): array
     {
+        $pageSize = max(1, (int)abs($params['pageSize'] ?? 10));
+        $itemsCount = max(0, (int)($params['itemsCount'] ?? 10));
+        $offset = max(0, (int)($params['offset'] ?? 0));
+        $linksCount = max(0, (int)($params['linksCount'] ?? 0));
+        $url = $params['url'] ?? '#';
+
+        if (!is_callable($url) && !is_string($url)) {
+            $url = '#';
+        }
+
         $ret = [
-            'pageSize' => (int)abs($params['pageSize'] ?? 10),
-            'itemsCount' => $params['itemsCount'] ?? 10,
-            'offset' => $params['offset'] ?? 0,
-            'linksCount' => $params['linksCount'] ?? 0,
-            'url' => $params['url'] ?? '#',
+            'pageSize' => $pageSize,
+            'itemsCount' => $itemsCount,
+            'offset' => $offset,
+            'linksCount' => $linksCount,
+            'url' => $url,
             'class' => $params['class'] ?? 'pagenav',
             'ulClass' => $params['ulClass'] ?? 'pagination',
             'liClass' => $params['liClass'] ?? 'page-item',
@@ -95,13 +120,13 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
 
         if (
             ($ret['itemsCount'] <= $ret['pageSize']) ||
-            ((int)($ret['itemsCount'] / $ret['pageSize']) < 2)
+            (intdiv($ret['itemsCount'], $ret['pageSize']) < 2)
         ) {
             $ret['current'] = null;
             $ret['last'] = null;
         } else {
-            $ret['current'] = (int)($ret['offset'] / $ret['pageSize']) + 1;
-            $ret['last'] = (int)($ret['itemsCount'] / $ret['pageSize']) + 1;
+            $ret['current'] = intdiv($ret['offset'], $ret['pageSize']) + 1;
+            $ret['last'] = intdiv($ret['itemsCount'], $ret['pageSize']) + 1;
         }
 
         return $ret;
@@ -111,7 +136,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      * Builds HTML tag
      *
      * @param string $name Tag name
-     * @param array $attributes Dictionary of tag attributes
+     * @param array<string, string> $attributes Dictionary of tag attributes
      *
      * @return string
      */
@@ -132,7 +157,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      * @param int $current Current page no
      * @param int $offset How many items from first page?
      * @param int $size How many items per page?
-     * @param string $url URL
+     * @param callable|string $url URL
      * @param string $liClass HTML LI element class
      * @param string $aClass HTML a element class
      *
@@ -153,21 +178,27 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      * Generates A HTML tag for moving to specific page
      *
      * @param int $page Page for link
-     * @param string $url Url to use for link
+     * @param callable|string $url Url or callable to use for link
      * @param string $title Title for link
-     * @param string[] $class Some extra classes for element
+     * @param array<int, string> $class Some extra classes for element
      *
      * @return string
      */
-    protected function buildAPageTag($page, $url, $title, array $class = []): string
+    protected function buildAPageTag(int $page, $url, string $title, array $class = []): string
     {
         if ($this->oldSchoolUrlMode) {
+            if (!is_string($url)) {
+                return '';
+            }
             $href = call_user_func(
                 $this->urlGeneratorCallable,
-                str_replace('%s', $page, $url)
+                str_replace('%s', (string)$page, $url)
             );
         } else {
-            $href = call_user_func_array($url, $page);
+            if (!is_callable($url)) {
+                return '';
+            }
+            $href = call_user_func_array($url, [$page]);
         }
         $class = implode(' ', $class);
         return $this->buildHTMLTag('a', compact('href', 'class')) . $title . '</a>';
@@ -180,7 +211,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      * @param int $linksCount Links count
      * @param int $last Last page no
      * @param int $size How many items per page?
-     * @param string $url URL
+     * @param callable|string $url URL
      * @param string $liClass HTML LI element class
      * @param string $aClass HTML a element class
      *
@@ -190,12 +221,12 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
     {
         $ret = '';
 
-        $min = min(1, ceil($current - $linksCount / 2));
-        $max = max($last, floor($current + $linksCount / 2));
+        $min = (int)min(1, (int)ceil($current - $linksCount / 2));
+        $max = (int)max($last, (int)floor($current + $linksCount / 2));
 
         for ($i = $min; $i <= $max; $i++) {
             $ret .= $this->buildHTMLTag('li', ['class' => $liClass]) .
-                $this->buildAPageTag(($i - 1) * $size, $url, $i, [$aClass]) .
+                $this->buildAPageTag(($i - 1) * $size, $url, (string)$i, [$aClass]) .
                 '</a>';
         }
 
@@ -209,7 +240,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      * @param int $last Last page no
      * @param int $offset How many items from first page?
      * @param int $size How many items per page?
-     * @param string $url URL
+     * @param callable|string $url URL
      * @param string $liClass HTML LI element class
      * @param string $aClass HTML a element class
      *
