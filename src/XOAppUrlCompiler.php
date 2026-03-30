@@ -37,6 +37,8 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
 
     /**
      * @inheritDoc
+     *
+     * @param array<int, string> $args
      */
     public function execute($args, Smarty_Internal_SmartyTemplateCompiler &$compiler)
     {
@@ -54,7 +56,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      * Generates static URL that will be embedded in compiled template
      *
      * @param string $url URL
-     * @param array $params Params
+     * @param array<int, string> $params Params
      *
      * @return string
      */
@@ -76,11 +78,11 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      * Executes buildUrl function
      *
      * @param string $url Url for supply to build URL function
-     * @param array $params Params to supply for that function
+     * @param array<int|string, string> $params Params to supply for that function
      *
      * @return string
      */
-    public static function executeBuildUrl($url, $params): string
+    public static function executeBuildUrl(string $url, array $params): string
     {
         return call_user_func(self::$buildUrlCallable, $url, $params);
     }
@@ -88,9 +90,9 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
     /**
      * Strips quotes from params
      *
-     * @param array $params Params
+     * @param array<int, string> $params Params
      *
-     * @return array
+     * @return array<int, string>
      */
     protected function stripQuotesFromParams(array $params): array
     {
@@ -110,7 +112,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      *
      * @return string
      */
-    public static function executePath($url): string
+    public static function executePath(string $url): string
     {
         return call_user_func(self::$pathCallable, $url);
     }
@@ -119,7 +121,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      * Generates code for dynamic version of URL
      *
      * @param string $url URL
-     * @param array $params Params
+     * @param array<int, string> $params Params
      *
      * @return string
      */
@@ -143,10 +145,11 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
     /**
      * Builds PHP array string for Smarty template
      *
-     * @param array $params
+     * @param array<int|string, string> $params
+     *
      * @return string
      */
-    protected function buildArrayStr(array $params)
+    protected function buildArrayStr(array $params): string
     {
         $ret = '[';
         foreach ($params as $k => $v) {

@@ -70,7 +70,16 @@ This list can be useful for comparing current plugins code with original version
 | [\Imponeer\Smarty\Extensions\XO\XOImgUrlCompiler](./src/XOImgUrlCompiler.php) | [smarty_compiler_xoImgUrl](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/compiler.xoImgUrl.php) |
 | [\Imponeer\Smarty\Extensions\XO\XOInboxCountFunction](./src/XOInboxCountFunction.php) | [smarty_function_xoInboxCount](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/function.xoInboxCount.php) |
 
-## Contributing
+## Development
+
+Static analysis is configured with [PHPStan](https://phpstan.org/):
+
+```bash
+composer install
+composer phpstan
+```
+
+## How to contribute?
 
 Contributions are welcome:
 
