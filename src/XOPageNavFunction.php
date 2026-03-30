@@ -2,14 +2,15 @@
 
 namespace Imponeer\Smarty\Extensions\XO;
 
-use Smarty_Internal_Template;
+use Smarty\FunctionHandler\FunctionHandlerInterface;
+use Smarty\Template;
 
 /**
  * Describes {xoPageNav} function
  *
  * @package Imponeer\Smarty\Extensions\XO
  */
-class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface
+class XOPageNavFunction implements FunctionHandlerInterface
 {
     /**
      * @var callable
@@ -58,7 +59,7 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
      *
      * @param array<string, mixed> $params
      */
-    public function execute($params, Smarty_Internal_Template &$template)
+    public function handle($params, Template $template)
     {
         $data = $this->calculateDataFromParams($params);
 
@@ -73,6 +74,11 @@ class XOPageNavFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFu
             $this->buildIndividualPageLinks($data['current'], $data['linksCount'], $last, $data['pageSize'], $data['url'], $data['liClass'], $data['linkClass']) .
             $this->buildNextPageLink($data['current'], $last, $data['offset'], $data['pageSize'], $data['url'], $data['liClass'], $data['linkClass']) .
             '</ul></nav>';
+    }
+
+    public function isCacheable(): bool
+    {
+        return true;
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Imponeer\Smarty\Extensions\XO\Tests;
 
-use Imponeer\Smarty\Extensions\XO\Tests\Support\DummySmartyTemplateCompiler;
 use Imponeer\Smarty\Extensions\XO\XOImgUrlCompiler;
 use PHPUnit\Framework\TestCase;
 
@@ -18,8 +17,8 @@ class XOImgUrlCompilerTest extends TestCase
             }
         );
 
-        $compilerInstance = new DummySmartyTemplateCompiler();
-        $result = $compiler->execute(['  logo.png  '], $compilerInstance);
+        $compilerInstance = $this->createMock(\Smarty\Compiler\Template::class);
+        $result = $compiler->compile(['  logo.png  '], $compilerInstance);
 
         $this->assertSame('logo.png', $receivedPath);
         $this->assertSame("img/logo.png\\'s", $result);

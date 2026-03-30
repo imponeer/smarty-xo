@@ -2,14 +2,15 @@
 
 namespace Imponeer\Smarty\Extensions\XO;
 
-use Smarty_Internal_SmartyTemplateCompiler;
+use Smarty\Compile\CompilerInterface;
+use Smarty\Compiler\Template;
 
 /**
  * Implements {xoAppUrl} tag
  *
  * @package Imponeer\Smarty\Extensions\XO
  */
-class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCompilerInterface
+class XOAppUrlCompiler implements CompilerInterface
 {
 
     /**
@@ -40,7 +41,7 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      *
      * @param array<int, string> $args
      */
-    public function execute($args, Smarty_Internal_SmartyTemplateCompiler &$compiler)
+    public function compile($args, Template $compiler, $parameter = [], $tag = null, $function = null)
     {
         $url = trim($args[0]);
         $params = (count($args) > 1) ? array_slice($args, 1) : [];
@@ -140,6 +141,14 @@ class XOAppUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
             );
         }
         return "<?php echo htmlspecialchars( $ret ); ?" . '>';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isCacheable(): bool
+    {
+        return true;
     }
 
     /**
