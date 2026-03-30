@@ -79,6 +79,12 @@ composer install
 composer phpstan
 ```
 
+Code style checks use [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer):
+
+```bash
+composer phpcs
+```
+
 ## How to contribute?
 
 Contributions are welcome:
