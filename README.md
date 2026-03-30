@@ -40,6 +40,97 @@ $smarty->addExtension(new \Imponeer\Smarty\Extensions\XO\XOExtension(
 ));
 ```
 
+### Using with Symfony Container
+
+```yaml
+# config/services.yaml
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Smarty\PathHelper: ~
+    App\Smarty\UrlHelper: ~
+    App\Smarty\ImageHelper: ~
+    App\Smarty\InboxCounter: ~
+    App\Smarty\PageUrlHelper: ~
+
+    Imponeer\Smarty\Extensions\XO\XOExtension:
+        arguments:
+            $pathCallable: ['@App\Smarty\PathHelper', 'path']
+            $buildUrlCallable: ['@App\Smarty\UrlHelper', 'build']
+            $imgUrlCallback: ['@App\Smarty\ImageHelper', 'resolve']
+            $inboxCounterCallback: ['@App\Smarty\InboxCounter', 'countUnread']
+            $pageUrlGenerator: ['@App\Smarty\PageUrlHelper', 'pageUrl']
+            $strPreviousPage: '<'
+            $strNextPage: '>'
+            $oldSchoolUrlMode: true
+
+    Smarty\Smarty:
+        calls:
+            - [addExtension, ['@Imponeer\Smarty\Extensions\XO\XOExtension']]
+```
+
+### Using with PHP-DI
+
+```php
+use function DI\create;
+use function DI\get;
+use function DI\value;
+
+return [
+    App\Smarty\PathHelper::class => create(),
+    App\Smarty\UrlHelper::class => create(),
+    App\Smarty\ImageHelper::class => create(),
+    App\Smarty\InboxCounter::class => create(),
+    App\Smarty\PageUrlHelper::class => create(),
+
+    \Imponeer\Smarty\Extensions\XO\XOExtension::class => create()
+        ->constructor(
+            [get(App\Smarty\PathHelper::class), 'path'],
+            [get(App\Smarty\UrlHelper::class), 'build'],
+            [get(App\Smarty\ImageHelper::class), 'resolve'],
+            [get(App\Smarty\InboxCounter::class), 'countUnread'],
+            [get(App\Smarty\PageUrlHelper::class), 'pageUrl'],
+            '<',
+            '>',
+            true
+        ),
+
+    \Smarty\Smarty::class => create()
+        ->method('addExtension', get(\Imponeer\Smarty\Extensions\XO\XOExtension::class)),
+];
+```
+
+### Using with League Container
+
+```php
+$container = new \League\Container\Container();
+
+$container->add(App\Smarty\PathHelper::class);
+$container->add(App\Smarty\UrlHelper::class);
+$container->add(App\Smarty\ImageHelper::class);
+$container->add(App\Smarty\InboxCounter::class);
+$container->add(App\Smarty\PageUrlHelper::class);
+
+$container->add(\Imponeer\Smarty\Extensions\XO\XOExtension::class, function () use ($container) {
+    return new \Imponeer\Smarty\Extensions\XO\XOExtension(
+        [$container->get(App\Smarty\PathHelper::class), 'path'],
+        [$container->get(App\Smarty\UrlHelper::class), 'build'],
+        [$container->get(App\Smarty\ImageHelper::class), 'resolve'],
+        [$container->get(App\Smarty\InboxCounter::class), 'countUnread'],
+        [$container->get(App\Smarty\PageUrlHelper::class), 'pageUrl']
+    );
+});
+
+$container->add(\Smarty\Smarty::class, function () use ($container) {
+    $smarty = new \Smarty\Smarty();
+    $smarty->addExtension($container->get(\Imponeer\Smarty\Extensions\XO\XOExtension::class));
+
+    return $smarty;
+});
+```
+
 ### Available plugins
 
 | Plugin | Description | Original XOOPS plugin |
