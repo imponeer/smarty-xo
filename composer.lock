@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c507f52d24d1a4be4c60de21df4ad10",
+    "content-hash": "9fc8331488ab12a36747998cb62e1d7e",
     "packages": [
         {
             "name": "imponeer/smarty-extensions-contracts",
