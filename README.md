@@ -1,97 +1,171 @@
 [![License](https://img.shields.io/github/license/imponeer/smarty-xo.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-xo.svg)](https://github.com/imponeer/smarty-xo/releases) [![Maintainability](https://api.codeclimate.com/v1/badges/8e9a1579e56699e95b05/maintainability)](https://codeclimate.com/github/imponeer/smarty-xo/maintainability) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-xo.svg)](http://php.net) 
+[![GitHub release](https://img.shields.io/github/release/imponeer/smarty-xo.svg)](https://github.com/imponeer/smarty-xo/releases) [![PHP](https://img.shields.io/packagist/php-v/imponeer/smarty-xo.svg)](http://php.net)
 [![Packagist](https://img.shields.io/packagist/dm/imponeer/smarty-xo.svg)](https://packagist.org/packages/imponeer/smarty-xo)
+[![Smarty version requirement](https://img.shields.io/packagist/dependency-v/imponeer/smarty-xo/smarty%2Fsmarty)](https://smarty-php.github.io)
 
 # Smarty XO
 
-A rewritten (due to licensing issues) collection of [Smarty](https://smarty.net) plugins that were originally written for [Xoops](https://xoops.org) but can now be used in any project that uses Smarty.
+> XOOPS-inspired Smarty plugins rewritten for modern projects and exposed as a native Smarty 5 extension
+
+This library provides a set of reusable [Smarty](https://smarty.net) plugins that originated in [XOOPS](https://xoops.org). The plugins are rewritten for licensing clarity and can be plugged into any Smarty-based project.
 
 ## Installation
 
-To install and use this package, we recommend to use [Composer](https://getcomposer.org):
+Install via [Composer](https://getcomposer.org):
 
 ```bash
 composer require imponeer/smarty-xo
 ```
 
-Otherwise, you need to include manually files from `src/` directory. 
+Otherwise, include the files from the `src/` directory manually.
 
-## Registering in Smarty
+## Setup
 
-If you want to use these extensions from this package in your project you need register them with [`registerPlugin` function](https://www.smarty.net/docs/en/api.register.plugin.tpl) from [Smarty](https://www.smarty.net). For example:
+### Registering as a native Smarty 5 extension
+
+Smarty 5 supports extensions directly via [`addExtension`](https://smarty-php.github.io/smarty/stable/api/extending/extensions/). Add `XOExtension` to wire all XOOPS-style compilers and functions at once:
+
 ```php
-$smarty = new \Smarty();
-$plugins = [
-  new \Imponeer\Smarty\Extensions\XO\XOAppUrlCompiler(
-    function (string $url): string { // function that converts url into path
-       return $url;
-    },
-    function (string $url, array $params = []): string { // function that adds params to path
-       return $url . '?' . http_build_query($params);
-    }
-  ),
-  new \Imponeer\Smarty\Extensions\XO\XOPageNavFunction(
-    function (string $url): string { // function that generates real url
-      return $url;
-    },
-    $strPreviousPage = '<',
-    $strNextPage = '>',
-    $oldSchoolUrlMode = true
-  ),
-  new \Imponeer\Smarty\Extensions\XO\XOImgUrlCompiler(
-     function (string $imgPath): string { // function that makes psiaudo path into real assets path
-        return $imgPath;
-     }
-  ),
-  new \Imponeer\Smarty\Extensions\XO\XOInboxCountFunction(
-     function (): ?int { // function that calc unread messages in user inbox 
-       return 0;
-     }
-  )
-];
-foreach ($plugins as $plugin) {
-  if ($plugin instanceof \Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface) {
-    $type = 'function';
-  } else {
-    $type = 'compiler';
-  }
-  $smarty->registerPlugin($type, $plugin->getName(), [$plugin, 'execute']);
-}
+$smarty = new \Smarty\Smarty();
+
+$smarty->addExtension(new \Imponeer\Smarty\Extensions\XO\XOExtension(
+    fn (string $url): string => $url, // converts URL into path
+    fn (string $url, array $params = []): string => $url . '?' . http_build_query($params), // adds params to path
+    fn (string $imgPath): string => $imgPath, // makes pseudo image path real
+    fn (): ?int => 0, // returns unread inbox count
+    fn (string $url): string => $url, // generates URL for pagination links
+    '<', // previous page symbol
+    '>', // next page symbol
+    true // old-school URL mode
+));
 ```
 
-## Inspirations list
+### Using with Symfony Container
 
-This list can be useful for comparing current plugins code with original version to see differences and find some useful data how to use these plugins.
+```yaml
+# config/services.yaml
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
 
-| XO Smarty plugin | Original Plugin (from [Xoops](https://xoops.org)) |
-|---------------|-----------------|
-| [\Imponeer\Smarty\Extensions\XO\XOPageNavFunction](./src/XOPageNavFunction.php) | [smarty_function_xoPageNav](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/function.xoPageNav.php) |
-| [\Imponeer\Smarty\Extensions\XO\XOAppUrlCompiler](./src/XOAppUrlCompiler.php) | [smarty_compiler_xoAppUrl](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/compiler.xoAppUrl.php) |
-| [\Imponeer\Smarty\Extensions\XO\XOImgUrlCompiler](./src/XOImgUrlCompiler.php) | [smarty_compiler_xoImgUrl](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/compiler.xoImgUrl.php) |
-| [\Imponeer\Smarty\Extensions\XO\XOInboxCountFunction](./src/XOInboxCountFunction.php) | [smarty_function_xoInboxCount](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/function.xoInboxCount.php) |
+    App\Smarty\PathHelper: ~
+    App\Smarty\UrlHelper: ~
+    App\Smarty\ImageHelper: ~
+    App\Smarty\InboxCounter: ~
+    App\Smarty\PageUrlHelper: ~
+
+    Imponeer\Smarty\Extensions\XO\XOExtension:
+        arguments:
+            $pathCallable: ['@App\Smarty\PathHelper', 'path']
+            $buildUrlCallable: ['@App\Smarty\UrlHelper', 'build']
+            $imgUrlCallback: ['@App\Smarty\ImageHelper', 'resolve']
+            $inboxCounterCallback: ['@App\Smarty\InboxCounter', 'countUnread']
+            $pageUrlGenerator: ['@App\Smarty\PageUrlHelper', 'pageUrl']
+            $strPreviousPage: '<'
+            $strNextPage: '>'
+            $oldSchoolUrlMode: true
+
+    Smarty\Smarty:
+        calls:
+            - [addExtension, ['@Imponeer\Smarty\Extensions\XO\XOExtension']]
+```
+
+### Using with PHP-DI
+
+```php
+use function DI\create;
+use function DI\get;
+use function DI\value;
+
+return [
+    App\Smarty\PathHelper::class => create(),
+    App\Smarty\UrlHelper::class => create(),
+    App\Smarty\ImageHelper::class => create(),
+    App\Smarty\InboxCounter::class => create(),
+    App\Smarty\PageUrlHelper::class => create(),
+
+    \Imponeer\Smarty\Extensions\XO\XOExtension::class => create()
+        ->constructor(
+            [get(App\Smarty\PathHelper::class), 'path'],
+            [get(App\Smarty\UrlHelper::class), 'build'],
+            [get(App\Smarty\ImageHelper::class), 'resolve'],
+            [get(App\Smarty\InboxCounter::class), 'countUnread'],
+            [get(App\Smarty\PageUrlHelper::class), 'pageUrl'],
+            '<',
+            '>',
+            true
+        ),
+
+    \Smarty\Smarty::class => create()
+        ->method('addExtension', get(\Imponeer\Smarty\Extensions\XO\XOExtension::class)),
+];
+```
+
+### Using with League Container
+
+```php
+$container = new \League\Container\Container();
+
+$container->add(App\Smarty\PathHelper::class);
+$container->add(App\Smarty\UrlHelper::class);
+$container->add(App\Smarty\ImageHelper::class);
+$container->add(App\Smarty\InboxCounter::class);
+$container->add(App\Smarty\PageUrlHelper::class);
+
+$container->add(\Imponeer\Smarty\Extensions\XO\XOExtension::class, function () use ($container) {
+    return new \Imponeer\Smarty\Extensions\XO\XOExtension(
+        [$container->get(App\Smarty\PathHelper::class), 'path'],
+        [$container->get(App\Smarty\UrlHelper::class), 'build'],
+        [$container->get(App\Smarty\ImageHelper::class), 'resolve'],
+        [$container->get(App\Smarty\InboxCounter::class), 'countUnread'],
+        [$container->get(App\Smarty\PageUrlHelper::class), 'pageUrl']
+    );
+});
+
+$container->add(\Smarty\Smarty::class, function () use ($container) {
+    $smarty = new \Smarty\Smarty();
+    $smarty->addExtension($container->get(\Imponeer\Smarty\Extensions\XO\XOExtension::class));
+
+    return $smarty;
+});
+```
+
+### Available plugins
+
+| Plugin | Description | Original XOOPS plugin |
+| --- | --- | --- |
+| [`XOAppUrlCompiler`](./src/XOAppUrlCompiler.php) | Compiles application URLs from pseudo paths. | [`smarty_compiler_xoAppUrl`](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/compiler.xoAppUrl.php) |
+| [`XOImgUrlCompiler`](./src/XOImgUrlCompiler.php) | Resolves asset image URLs from pseudo paths. | [`smarty_compiler_xoImgUrl`](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/compiler.xoImgUrl.php) |
+| [`XOPageNavFunction`](./src/XOPageNavFunction.php) | Renders classic page navigation links. | [`smarty_function_xoPageNav`](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/function.xoPageNav.php) |
+| [`XOInboxCountFunction`](./src/XOInboxCountFunction.php) | Returns unread inbox message count. | [`smarty_function_xoInboxCount`](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/function.xoInboxCount.php) |
 
 ## Development
 
-Static analysis is configured with [PHPStan](https://phpstan.org/):
+### Code quality tools
 
-```bash
-composer install
-composer phpstan
-```
+- **PHPUnit** – unit tests in `tests/`  
+  ```bash
+  vendor/bin/phpunit
+  ```
 
-Code style checks use [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer):
+- **PHPStan** – static analysis  
+  ```bash
+  composer phpstan
+  ```
 
-```bash
-composer phpcs
-```
+- **PHP_CodeSniffer** – coding standards  
+  ```bash
+  composer phpcs
+  ```
 
-## How to contribute?
+## Contributing
 
-Contributions are welcome:
+Contributions are welcome!
 
 1. Fork the repository and create a feature branch.
 2. Install dependencies with `composer install`.
-3. If you add functionality, include or update tests when available and run `composer validate` to ensure the package metadata stays valid.
+3. If you add functionality, include or update tests and run `composer validate`.
 4. Open a pull request describing the change and why it helps.
 
-If you find a bug or have a question, please open an issue in the [issues tab](https://github.com/imponeer/smarty-xo/issues).
+If you find a bug or have a feature request, please open an issue in the [issue tracker](https://github.com/imponeer/smarty-xo/issues).
