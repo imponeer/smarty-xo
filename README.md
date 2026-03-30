@@ -4,7 +4,7 @@
 
 # Smarty XO
 
-Rewritten (due licensing issues) collection [Smarty](https://smarty.net) plugins that where originally written for [Xoops](https://xoops.org) but now can be used everywhere.
+A rewritten (due to licensing issues) collection of [Smarty](https://smarty.net) plugins that were originally written for [Xoops](https://xoops.org) but can now be used in any project that uses Smarty.
 
 ## Installation
 
@@ -70,8 +70,13 @@ This list can be useful for comparing current plugins code with original version
 | [\Imponeer\Smarty\Extensions\XO\XOImgUrlCompiler](./src/XOImgUrlCompiler.php) | [smarty_compiler_xoImgUrl](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/compiler.xoImgUrl.php) |
 | [\Imponeer\Smarty\Extensions\XO\XOInboxCountFunction](./src/XOInboxCountFunction.php) | [smarty_function_xoInboxCount](https://github.com/XOOPS/XoopsCore25/blob/v2.5.8/htdocs/class/smarty/xoops_plugins/function.xoInboxCount.php) |
 
-## How to contribute?
+## Contributing
 
-If you want to add some functionality or fix bugs, you can fork, change and create pull request. If you not sure how this works, try [interactive GitHub tutorial](https://skills.github.com).
+Contributions are welcome:
 
-If you found any bug or have some questions, use [issues tab](https://github.com/imponeer/smarty-xo/issues) and write there your questions.
+1. Fork the repository and create a feature branch.
+2. Install dependencies with `composer install`.
+3. If you add functionality, include or update tests when available and run `composer validate` to ensure the package metadata stays valid.
+4. Open a pull request describing the change and why it helps.
+
+If you find a bug or have a question, please open an issue in the [issues tab](https://github.com/imponeer/smarty-xo/issues).
