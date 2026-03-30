@@ -18,6 +18,15 @@
             "Imponeer\\Smarty\\Extensions\\XO\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Imponeer\\Smarty\\Extensions\\XO\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "smarty/smarty": "^4.3"
+    },
     "keywords": [
         "smarty",
         "xoops",
