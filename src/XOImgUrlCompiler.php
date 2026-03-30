@@ -2,14 +2,15 @@
 
 namespace Imponeer\Smarty\Extensions\XO;
 
-use Smarty_Internal_SmartyTemplateCompiler;
+use Smarty\Compile\CompilerInterface;
+use Smarty\Compiler\Template;
 
 /**
  * Describes {xoImgUrl}
  *
  * @package Imponeer\Smarty\Extensions\XO
  */
-class XOImgUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCompilerInterface
+class XOImgUrlCompiler implements CompilerInterface
 {
     /**
      * @var callable
@@ -31,9 +32,17 @@ class XOImgUrlCompiler implements \Imponeer\Contracts\Smarty\Extension\SmartyCom
      *
      * @param array<int, string> $args
      */
-    public function execute($args, Smarty_Internal_SmartyTemplateCompiler &$compiler)
+    public function compile($args, Template $compiler, $parameter = [], $tag = null, $function = null)
     {
         return addslashes(call_user_func($this->imgUrlCallback, trim($args[0])));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isCacheable(): bool
+    {
+        return true;
     }
 
     /**

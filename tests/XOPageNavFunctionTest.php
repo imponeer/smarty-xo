@@ -2,7 +2,6 @@
 
 namespace Imponeer\Smarty\Extensions\XO\Tests;
 
-use Imponeer\Smarty\Extensions\XO\Tests\Support\DummyTemplate;
 use Imponeer\Smarty\Extensions\XO\XOPageNavFunction;
 use PHPUnit\Framework\TestCase;
 
@@ -52,8 +51,8 @@ class XOPageNavFunctionTest extends TestCase
             'Next'
         );
 
-        $template = new DummyTemplate();
-        $html = $function->execute(
+        $template = $this->createMock(\Smarty\Template::class);
+        $html = $function->handle(
             [
                 'itemsCount' => 30,
                 'pageSize' => 10,

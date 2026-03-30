@@ -2,14 +2,15 @@
 
 namespace Imponeer\Smarty\Extensions\XO;
 
-use Smarty_Internal_Template;
+use Smarty\FunctionHandler\FunctionHandlerInterface;
+use Smarty\Template;
 
 /**
  * Defines {xoInboxCount} function
  *
  * @package Imponeer\Smarty\Extensions\XO
  */
-class XOInboxCountFunction implements \Imponeer\Contracts\Smarty\Extension\SmartyFunctionInterface
+class XOInboxCountFunction implements FunctionHandlerInterface
 {
     /**
      * @var callable
@@ -39,7 +40,7 @@ class XOInboxCountFunction implements \Imponeer\Contracts\Smarty\Extension\Smart
      *
      * @param array<string, mixed> $params
      */
-    public function execute($params, Smarty_Internal_Template &$template)
+    public function handle($params, Template $template)
     {
         $count = call_user_func($this->userInboxCounterCallback);
 
@@ -54,5 +55,10 @@ class XOInboxCountFunction implements \Imponeer\Contracts\Smarty\Extension\Smart
         }
 
         $template->assign($params['assign'], $count);
+    }
+
+    public function isCacheable(): bool
+    {
+        return true;
     }
 }
