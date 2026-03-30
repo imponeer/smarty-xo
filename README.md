@@ -6,8 +6,6 @@
 
 A rewritten (due to licensing issues) collection of [Smarty](https://smarty.net) plugins that were originally written for [Xoops](https://xoops.org) but can now be used in any project that uses Smarty.
 
-Requires PHP 8.3 or newer.
-
 ## Installation
 
 To install and use this package, we recommend to use [Composer](https://getcomposer.org):
