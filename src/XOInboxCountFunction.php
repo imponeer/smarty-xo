@@ -36,6 +36,8 @@ class XOInboxCountFunction implements \Imponeer\Contracts\Smarty\Extension\Smart
 
     /**
      * @inheritDoc
+     *
+     * @param array<string, mixed> $params
      */
     public function execute($params, Smarty_Internal_Template &$template)
     {
@@ -45,10 +47,12 @@ class XOInboxCountFunction implements \Imponeer\Contracts\Smarty\Extension\Smart
             return;
         }
 
+        $count = (int)$count;
+
         if (!isset($params['assign']) || empty($params['assign'])) {
-            return (int)$count;
+            return (string)$count;
         }
 
-        $template->assign($params['assign'], (int)$count);
+        $template->assign($params['assign'], $count);
     }
 }
